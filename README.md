@@ -1,6 +1,6 @@
 # XDK MQTT Application
 
-Welcome to the XDK MQTT application. This code is an example of an application built using Eclipse Mita. It involves interactions with MQTT messaging and control of lighting using XDK 110.
+Welcome to the XDK MQTT application (integrating Bosch XDK with peaq network). This code is an example of an application built using Eclipse Mita. It involves interactions with MQTT messaging and control of lighting using XDK 110.
 
 ## Getting Started
 
