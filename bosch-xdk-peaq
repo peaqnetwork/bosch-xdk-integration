@@ -1,0 +1,82 @@
+/**
+ * Welcome to Eclipse Mita.
+ *
+ * Not sure what to do now?
+ * Check out the "Getting started" guide on https://mita.io.
+ */
+
+package main;
+import platforms.xdk110;
+
+// 0 as equal
+// positive or negative as inequal
+native unchecked fn strcmp(str1 : string, str2: string) : int32
+	header "string.h";
+
+setup XDK110 {
+  applicationName = "XDK_Mqtt";
+}
+
+setup net: WLAN { 
+	ssid = "";
+  authentication = Personal(psk = "");
+}
+
+setup lighting : LED {
+	var homeLight = light_up(Orange);
+}
+
+//setup api: HttpRestClient {
+//  transport = net;
+//  endpointBase = "http://18.140.241.253";
+//
+//  var lightStatus = resource("/xdk/lightStatus");
+//}
+
+setup mqtt: MQTT {
+  transport = net;
+  url = "mqtt://broker.hivemq.com:8000";
+  
+  clientId = "XDK42_1";
+
+  var telemetry = topic("telemetry");
+  var deviceIDTopic = topic("deviceID");  // A new topic for sending the device ID.
+}
+
+let deviceID: string = "5FCksdjBZmJdJfed9zVEvScXoZVvDd4zPdFgvKnx44ihFp7D";  // Your unique ID here.
+
+fn getJsonData() {
+	var celcius = environment.temperature.read() / 1000;
+	var humidity = environment.humidity.read();
+	var pressure = environment.pressure.read();
+	var light = light.intensity.read() / 1000;
+	var lightStatus = lighting.homeLight.read();
+
+	return `{"deviceID": ${deviceID} ,"temperature": ${celcius}, "humidity": ${humidity}, "pressure":${pressure}, "lux": ${light}, "lightStatus": ${lightStatus}}`;
+}
+
+every 2 seconds {
+  var jsonData = getJsonData();
+  mqtt.telemetry.write(jsonData);
+  println(`Sent ${jsonData}`);
+}
+
+every button_one.released {
+	switchLightStatus();
+}
+
+fn switchLightStatus() {
+	var lightStatus = lighting.homeLight.read();
+	lighting.homeLight.write(!lightStatus);
+}
+
+//every 5 seconds {
+//	if (strcmp(api.lightStatus.read(), "1") == 0) {
+//		println("Receive the command from server to switch the light status");
+//		switchLightStatus();
+//	}
+//}
+
+every button_one.pressed {
+  mqtt.deviceIDTopic.write(deviceID); // Send the device ID upon receiving a request.
+}
