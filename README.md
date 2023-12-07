@@ -8,8 +8,6 @@ To run this application on your XDK 110, follow these steps:
 
 1. Ensure that you have the XDK Workbench installed and set up.
 
-2. Clone or download this repository to your local machine.
-
 3. Open the project in XDK Workbench.
 
 4. Make sure you have your XDK 110 connected to your computer.
